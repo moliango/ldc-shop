@@ -105,6 +105,7 @@ export async function deleteCard(cardId: number) {
     revalidatePath('/')
 }
 
+
 export async function saveShopName(rawName: string) {
     await checkAdmin()
 
@@ -145,3 +146,4 @@ export async function deleteReview(reviewId: number) {
     await db.delete(reviews).where(eq(reviews.id, reviewId))
     revalidatePath('/admin/reviews')
 }
+

@@ -280,18 +280,53 @@ export async function GET(req: Request) {
         parts.push(`-- Database Migration Dump (Vercel Postgres -> Cloudflare D1)`)
         parts.push(`-- Generated at ${new Date().toISOString()}`)
         parts.push(``)
-        parts.push(`BEGIN TRANSACTION;`)
+        parts.push(`-- Note: Transaction statements removed for D1 compatibility`)
         parts.push(``)
+
+        // Map camelCase keys to snake_case for SQL export
+        const columnMapping: Record<string, string> = {
+          // Products
+          isActive: 'is_active',
+          sortOrder: 'sort_order',
+          purchaseLimit: 'purchase_limit',
+          createdAt: 'created_at',
+          // Cards
+          productId: 'product_id',
+          cardKey: 'card_key',
+          isUsed: 'is_used',
+          reservedOrderId: 'reserved_order_id',
+          reservedAt: 'reserved_at',
+          usedAt: 'used_at',
+          // Orders
+          orderId: 'order_id',
+          productName: 'product_name',
+          tradeNo: 'trade_no',
+          paidAt: 'paid_at',
+          deliveredAt: 'delivered_at',
+          userId: 'user_id',
+          // Reviews
+          // orderId, productId, userId already covered
+          // Settings
+          updatedAt: 'updated_at',
+          // Login Users
+          lastLoginAt: 'last_login_at'
+        }
 
         for (const [tableName, rows] of Object.entries(full)) {
           if (!rows.length) continue
           for (const row of rows) {
-            parts.push(rowToInsertOrIgnore(tableName, row as any))
+            // Convert keys to snake_case
+            const sqlRow: Record<string, any> = {}
+            for (const [key, val] of Object.entries(row)) {
+              const sqlKey = columnMapping[key] || key
+              sqlRow[sqlKey] = val
+            }
+            parts.push(rowToInsertOrIgnore(tableName, sqlRow))
           }
           parts.push(``)
         }
 
-        parts.push(`COMMIT;`)
+        parts.push(`-- End of Dump`)
         parts.push(``)
 
         const sqlText = parts.join("\n")
