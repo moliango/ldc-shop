@@ -13,7 +13,7 @@ compatibility_date = "2026-01-06"
 [[d1_databases]]
 binding = "DB"
 database_name = "ldc-shop-db"
-database_id = "YOUR_DATABASE_ID"
+database_id = "aaa6fa50-0b95-4684-8a5a-b643c80aba8e"
 # preview_database_id = "DB" # Use strictly for local dev
 
 [triggers]
